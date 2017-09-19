@@ -1,7 +1,8 @@
 class Stopwatch {
-    constructor(display) {
+    constructor(display, results) {
         this.running = false;
         this.display = display;
+        this.results = results;
         this.reset();
         this.print(this.times);
     }
@@ -48,9 +49,28 @@ class Stopwatch {
 	}
 
 	stop() {
+        if (this.running) this.save(this.times);
 	    this.running = false;
 	    clearInterval(this.watch);
 	}
+
+    hardReset() {
+        this.reset();
+        this.print();
+        this.clearList();
+        if (this.running) this.running = false;
+    }
+
+    save(t) {
+        var li = document.createElement('li');
+        var liText = document.createTextNode(`${pad0(t.minutes)}:${pad0(t.seconds)}:${pad0(Math.floor(t.miliseconds))}`);
+        li.appendChild(liText);
+        this.results.appendChild(li);
+    }
+
+    clearList() {
+        this.results.innerHTML = '';
+    }
 }
 
 function pad0(value) {
@@ -61,8 +81,10 @@ function pad0(value) {
     return result;
 }
 
-const stopwatch = new Stopwatch(document.querySelector('.stopwatch'));
+const stopwatch = new Stopwatch(document.querySelector('.stopwatch'), document.querySelector('.results'));
 var startButton = document.getElementById('start');
 startButton.addEventListener('click', () => stopwatch.start());
 var stopButton = document.getElementById('stop');
 stopButton.addEventListener('click', () => stopwatch.stop());
+var resetButton = document.getElementById('reset');
+resetButton.addEventListener('click', () => stopwatch.hardReset());
